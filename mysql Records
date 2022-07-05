@@ -1,0 +1,69 @@
+            with product_time_window as
+            (
+                select * from product 
+                where last_modified between "%(start_time)s" and "%(end_time)s"
+            )
+            select "%(start_time)s" start_time, "%(end_time)s" end_time, P1.crop_sku, P1.selling_price min_selling_price
+            from 
+                product_time_window P1
+            inner join
+                (Select min(selling_price) selling_price from product_time_window 
+                ) P2
+            on P1.selling_price = P2.selling_price;
+
+
+
+INSERT INTO product 
+(region, crop_name, crop_sku, selling_price, last_modified) 
+VALUES 
+("%(region)s", "%(crop_name)s", "%(crop_sku)s", %(selling_price)s, "%(last_modified)");
+
+
+SELECT * FROM informat SELECT * FROM information_schema.tables
+              WHERE table_name = 'min_selling_price';ion_schema.tables
+
+Inserting Values in table
+
+INSERT INTO min_selling_price 
+(start, end, crop_sku, min_selling_price) 
+VALUES 
+("%(start_time)s", "%(end_time)s", "%(sku)s", %(min_selling_price)s);
+
+
+INSERT INTO product (region, crop_name, crop_sku, selling_price, last_modified) VALUES ("RJ", "Cotton", "ABC2", 1100, "2022-07-02 10:00:00");
+
+
+INSERT INTO product (region, crop_name, crop_sku, selling_price, last_modified)  VALUES ("HR", "Okra", "ABC3", 1300, "2022-07-03 10:00:00");
+
+
+INSERT INTO product (region, crop_name, crop_sku, selling_price, last_modified)  VALUES ("MP", "Okra", "ABC4", 1200, "2022-07-04 10:00:00");
+
+
+INSERT INTO product (region, crop_name, crop_sku, selling_price, last_modified)  VALUES ("MP", "Okra", "ABC5", 1400, "2022-07-05 10:00:00");
+
+
+INSERT INTO product (region, crop_name, crop_sku, selling_price, last_modified)  VALUES ("RJ", "Cotton", "ABC6", 1000, "2022-07-06 10:00:00");
+
+
+INSERT INTO product (region, crop_name, crop_sku, selling_price, last_modified)  VALUES ("RJ", "Cotton", "ABC7", 1100, "2022-07-07 10:00:00");
+
+INSERT INTO product (region, crop_name, crop_sku, selling_price, last_modified)  VALUES ("RJ", "Cotton", "ABC8", 1000, "2022-07-08 10:00:00");
+
+
+
+create table min_selling_price (
+    start datetime,
+    end datetime,
+    crop_sku varchar(255),
+    min_selling_price double
+);
+
+create table product  (
+    region varchar(255), 
+    crop_name varchar(255), 
+    crop_sku varchar(255), 
+    selling_price double, 
+    last_modified datetime,
+);
+
+

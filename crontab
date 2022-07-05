@@ -1,0 +1,1 @@
+*/25 * * * * cd /home/hanchau/proj/ds/agrim && agr/bin/python3 -m sql_to_sql.sql_to_sql
