@@ -32,24 +32,22 @@ class ConfigTasks:
 
 
 class DataLogics:
-
     def conditional_price_selector(df1, df2):
         try:
-            joined = df1.join(df2, lsuffix='_a', rsuffix="_b").dropna()
+            joined = df1.join(df2, lsuffix="_a", rsuffix="_b").dropna()
             df = pd.DataFrame(joined)
             logger.info(f"\n -----\n{df.head()}")
             df["product"] = df["product_a"]
             for row in df.iterrows():
-                if df.at[row[0], 'status'] == "inactive":
-                    df.at[row[0], 'last_price'] = joined.at[row[0], 'price']
+                if df.at[row[0], "status"] == "inactive":
+                    df.at[row[0], "last_price"] = joined.at[row[0], "price"]
                 else:
-                    df.at[row[0], 'last_price'] = joined.at[row[0], 'last_price']
+                    df.at[row[0], "last_price"] = joined.at[row[0], "last_price"]
             ret_df = df[["product", "last_price"]]
             logger.info(f"\n -----\n{ret_df.head()}")
             return ret_df.reset_index(drop=True)
         except Exception as err:
             logger.error(f"Error in applying conditional price logic.")
-
 
 
 if __name__ == "__main__":
@@ -65,7 +63,7 @@ if __name__ == "__main__":
     bucket = src2.get("bucket")
     file_s3 = src2.get("file_s3")
     file_loc = src2.get("file_loc")
-    
+
     dest = task_info.get("dest")
     dest_bucket = dest.get("bucket")
     dest_file_s3 = dest.get("file_s3")
@@ -79,16 +77,16 @@ if __name__ == "__main__":
         raise Exception("Cant' Move Forward! Aborting!")
     latest_price_data = pd.read_csv(file_loc)
 
-
     conn = sql.connect(**src_conn)
     product_status = pd.read_sql(src_get_query, conn)
 
-
-    updated_price = DataLogics.conditional_price_selector(latest_price_data, product_status)
+    updated_price = DataLogics.conditional_price_selector(
+        latest_price_data, product_status
+    )
     updated_price.to_csv(dest_file_loc)
-    
-    s3.delete_object(bucket, dest_file_s3) # old file
-    s3.upload_objects(dest_bucket, dest_file_loc, dest_file_s3) # new file
+
+    s3.delete_object(bucket, dest_file_s3)  # old file
+    s3.upload_objects(dest_bucket, dest_file_loc, dest_file_s3)  # new file
 
     logger.info(f"Confirming Objects on S3.")
     s3.list_objects(bucket)
