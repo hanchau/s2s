@@ -1,3 +1,4 @@
+from asyncio.log import logger
 import boto3
 from botocore.exceptions import ClientError
 
@@ -14,7 +15,7 @@ class S3Connector:
     def list_buckets(self):
         try:
             response = self.client.list_buckets()
-            self.logger.info('Existing buckets:')
+            self.logger.info(f'Existing buckets:')
             for bucket in response['Buckets']:
                 self.logger.info(f"""----------> {bucket["Name"]}""")
             return response.get("Buckets")
@@ -24,7 +25,7 @@ class S3Connector:
     def list_objects(self, bucket):
         try:
             bucket_ob = self.res_client.Bucket(bucket)
-            self.logger.info('Existing Objects in Bucket {bucket} are:')
+            self.logger.info(f'Existing Objects in Bucket {bucket} are:')
             for object in bucket_ob.objects.all():
                 self.logger.info(f"""----------> {object.key}""")
             return bucket_ob.objects.all()
@@ -46,11 +47,20 @@ class S3Connector:
         try:
             location = {'LocationConstraint': region}
             self.client.create_bucket(Bucket=bucket, CreateBucketConfiguration=location)
+            self.logger.info(f"Bucket {bucket} created successfully.")
         except ClientError as err:
             self.logger.error(f"Bucket Creation Error: {err}")
             return False
         return True
 
+    def delete_bucket(self, bucket):
+        try:
+            self.client.delete_bucket(Bucket=bucket)
+            self.logger.info(f"Bucket {bucket} deleted successfully.")
+        except ClientError as err:
+            self.logger.error(f"Bucket Deletion Error: {err}")
+            return False
+        return True
 
     def upload_objects(self, bucket, src, dest):
         try:

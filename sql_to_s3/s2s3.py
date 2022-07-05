@@ -93,3 +93,8 @@ if __name__ == "__main__":
     logger.info(f"Confirming Objects on S3.")
     s3.list_objects(bucket)
     logger.info(f"Process finished. Total time taken: [{time.time() - start_time}]")
+
+    # s3.create_bucket("labra-123")
+    # s3.list_buckets()
+    # s3.delete_bucket("labra-123")
+    # s3.list_buckets()

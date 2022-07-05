@@ -7,6 +7,9 @@
     pip install -r requirements.txt
     python -m sql_to_sql.s2s
 
+    # add the s3 acces id and keys in the environment.sh
+    chmod +x environment.sh
+    source ./environment.sh
     python -m sql_to_sql.s2s3
 
 #### CRONTAB
