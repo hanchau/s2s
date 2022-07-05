@@ -67,62 +67,66 @@ if __name__ == "__main__":
 
     tasks = ConfigTasks(CONFIG_PATH)
     for task, task_info in tasks:
-        if task_info.get("skip"):
-            continue
-
-        src = task_info.get("source")
-        src_conn = src.get("conn")
-        src_get_query = src.get("get_query")
-        src_time_frame = src.get("time_frame")
-
-        dest = task_info.get("dest")
-        dest_conn = dest.get("conn")
-        dest_check_query = dest.get("check_query")
-        dest_create_query = dest.get("create_query")
-        dest_insert_query = dest.get("insert_query")
-        logger.info(f"Started Source Stage.")
-        sql = SQLConnector(logger)
-        cleaner = Cleaner(logger)
-
         try:
-            start_time = time.time()
-            conn = sql.connect(**src_conn)
-            src_get_query = Transformer.format_time(src_get_query, src_time_frame)
-            records = sql.fire_query(conn, src_get_query, rec_in_json=True)
-            total_time = time.time() - start_time
-            logger.info(
-                f"Records fetching complete. Total Records Fetched: [{len(records)}]. Total Time: [{total_time}]"
+            if task_info.get("skip"):
+                continue
+
+            src = task_info.get("source")
+            src_conn = src.get("conn")
+            src_get_query = src.get("get_query")
+            src_time_frame = src.get("time_frame")
+
+            dest = task_info.get("dest")
+            dest_conn = dest.get("conn")
+            dest_check_query = dest.get("check_query")
+            dest_create_query = dest.get("create_query")
+            dest_insert_query = dest.get("insert_query")
+            logger.info(f"Started Source Stage.")
+            sql = SQLConnector(logger)
+            cleaner = Cleaner(logger)
+
+            try:
+                start_time = time.time()
+                conn = sql.connect(**src_conn)
+                src_get_query = Transformer.format_time(src_get_query, src_time_frame)
+                records = sql.fire_query(conn, src_get_query, rec_in_json=True)
+                total_time = time.time() - start_time
+                logger.info(
+                    f"Records fetching complete. Total Records Fetched: [{len(records)}]. Total Time: [{total_time}]"
+                )
+            except Exception as err:
+                logger.error(f"Source Stage Error: {err}")
+                raise Exception("Can't move forward")
+
+            cleaner.clean(conn, src_get_query, src, src_conn, src_get_query, src_time_frame)
+
+            logger.info(f"Started Destination Stage")
+            try:
+                start_time = time.time()
+                conn = sql.connect(**dest_conn)
+                dest_exist = sql.fire_query(conn, dest_check_query)
+                if not dest_exist:
+                    sql.fire_query(conn, dest_create_query)
+
+                status, no_of_rec = Uploader.dump_records(conn, dest_insert_query, records)
+                total_time = time.time() - start_time
+                logger.info(
+                    f"Ingestion Status: [{status}]. Total Records inserted: [{no_of_rec}]. Total Time: [{total_time}]"
+                )
+            except Exception as err:
+                logger.error(f"Source Stage Error: {err}")
+
+            cleaner.clean(
+                conn,
+                dest_exist,
+                status,
+                no_of_rec,
+                dest,
+                dest_conn,
+                dest_check_query,
+                dest_create_query,
+                dest_insert_query,
             )
+            logger.info(f"Task {task} Complete Successfull.")
         except Exception as err:
-            logger.error(f"Source Stage Error: {err}")
-            raise Exception("Can't move forward")
-
-        cleaner.clean(conn, src_get_query, src, src_conn, src_get_query, src_time_frame)
-
-        logger.info(f"Started Destination Stage")
-        try:
-            start_time = time.time()
-            conn = sql.connect(**dest_conn)
-            dest_exist = sql.fire_query(conn, dest_check_query)
-            if not dest_exist:
-                sql.fire_query(conn, dest_create_query)
-
-            status, no_of_rec = Uploader.dump_records(conn, dest_insert_query, records)
-            total_time = time.time() - start_time
-            logger.info(
-                f"Ingestion Status: [{status}]. Total Records inserted: [{no_of_rec}]. Total Time: [{total_time}]"
-            )
-        except Exception as err:
-            logger.error(f"Source Stage Error: {err}")
-
-        cleaner.clean(
-            conn,
-            dest_exist,
-            status,
-            no_of_rec,
-            dest,
-            dest_conn,
-            dest_check_query,
-            dest_create_query,
-            dest_insert_query,
-        )
+            logger.error(f"Task {task} Failed.")
