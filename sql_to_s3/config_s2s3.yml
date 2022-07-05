@@ -13,6 +13,7 @@ task1:
   dest: 
     bucket: agrim-123
     file: s3_latest_price.csv
+    file_to: downloaded.csv
 
 task2:
   skip: True

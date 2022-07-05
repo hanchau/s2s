@@ -1,6 +1,7 @@
 import os
 import yaml
 import time
+import pandas as pd
 from utils.logger import Logger
 from utils.misc import Cleaner
 from connectors.sql import SQLConnector
@@ -31,6 +32,7 @@ class ConfigTasks:
 
 if __name__ == "__main__":
 
+    import pdb; pdb.set_trace()
     tasks = ConfigTasks(CONFIG_PATH)
     for task, task_info in tasks:
         if task_info.get("skip"):
@@ -43,8 +45,14 @@ if __name__ == "__main__":
         dest = task_info.get("dest")
         bucket = dest.get("bucket")
         file = dest.get("file")
+        file_to = dest.get("file_to")
+        
 
         sql = SQLConnector(logger)
         s3 = S3Connector(logger)
 
-        
+        if not s3.download_objects(bucket, file, file_to):
+            logger.error(f"Issue in Downloading File from S3:")
+            raise Exception("Cant' Move Forward! Aborting!")
+
+        latest_price_data = pd.read_csv(file_to)
