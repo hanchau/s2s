@@ -18,6 +18,3 @@
     crontab -e
         */25 * * * * cd /path/to/project && s2s-env/bin/python3 -m sql_to_sql.s2s
         */50 * * * * cd /path/to/project && s2s-env/bin/python3 -m sql_to_s3.s2s3
-
-#### Cleaning
-    make clean
