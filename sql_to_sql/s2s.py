@@ -5,8 +5,8 @@ from utils.misc import Cleaner
 from connectors.sql import SQLConnector
 from datetime import datetime, timedelta
 
-CONFIG_PATH = "sql_to_sql/config_sql_to_sql.yml"
-LOGFILE = "logs/sql_to_sql.logs"
+CONFIG_PATH = "sql_to_sql/config_s2s.yml"
+LOGFILE = "logs/s2s.logs"
 
 logger = Logger(logfile=LOGFILE, _name=__name__)
 

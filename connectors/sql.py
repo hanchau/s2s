@@ -5,12 +5,14 @@ class SQLConnector:
     def __init__(self, logger):
         self.logger = logger
 
-    def connect(self,
-        host="localhost", user="anuj", pwd="ANUJ@123@mysql", db="agrim", port=3306
+    def connect(
+        self, host="localhost", user="anuj", pwd="ANUJ@123@mysql", db="agrim", port=3306
     ):
         try:
             conn = connect(host=host, user=user, password=pwd, database=db, port=port)
-            self.logger.info(f"Connection established with: [{host}|{port}|{user}|{db}]")
+            self.logger.info(
+                f"Connection established with: [{host}|{port}|{user}|{db}]"
+            )
             return conn
         except Exception as err:
             self.logger.error(f"Error Connecting: {err}")
@@ -25,5 +27,3 @@ class SQLConnector:
             return result
         except Exception as err:
             self.logger.error(f"Error in firing Query: {err}")
-
-

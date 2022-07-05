@@ -1,0 +1,19 @@
+product:
+    product, status, price
+    ABC1, active, 1500
+    ABC2, inacive, 1000
+    ABC3, active, 1300
+    ABC4, inactive, 1100
+    ABC5, active, 1100
+    ABC6, inactive, 500
+    ABC7, active, 400
+    
+
+INSERT INTO product_status (product, status, price) VALUES ("ABC1", "active", 1500);
+INSERT INTO product_status (product, status, price) VALUES ("ABC2", "active", 1000);
+INSERT INTO product_status (product, status, price) VALUES ("ABC3", "active", 1300);
+INSERT INTO product_status (product, status, price) VALUES ("ABC4", "active", 1100);
+INSERT INTO product_status (product, status, price) VALUES ("ABC5", "active", 1100);
+INSERT INTO product_status (product, status, price) VALUES ("ABC6", "active", 500);
+INSERT INTO product_status (product, status, price) VALUES ("ABC7", "active", 400);
+INSERT INTO product_status (product, status, price) VALUES ("ABC8", "active", 1500);
