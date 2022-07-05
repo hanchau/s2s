@@ -69,6 +69,7 @@ if __name__ == "__main__":
     dest_file_s3 = dest.get("file_s3")
     dest_file_loc = dest.get("file_loc")
 
+    cleaner = Cleaner(logger)
     sql = SQLConnector(logger)
     s3 = S3Connector(logger)
 
@@ -92,7 +93,4 @@ if __name__ == "__main__":
     s3.list_objects(bucket)
     logger.info(f"Process finished. Total time taken: [{time.time() - start_time}]")
 
-    # s3.create_bucket("labra-123")
-    # s3.list_buckets()
-    # s3.delete_bucket("labra-123")
-    # s3.list_buckets()
+    # cleaner.clean_files(file_s3, file_loc, dest_file_s3, dest_file_loc)
