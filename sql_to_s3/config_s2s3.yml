@@ -8,12 +8,12 @@ task1:
       user: root
       pwd: ROOT@123@mysql
     get_query:    |
-                    asf
-                    asdf
-  dest: 
+                    select product, status, price from product_status;
+  source2: 
     bucket: agrim-123
-    file: s3_latest_price.csv
-    file_to: downloaded.csv
-
-task2:
-  skip: True
+    file_s3: s3_latest_price.csv
+    file_loc: downloaded.csv
+  dest:
+    bucket: agrim-123
+    file_s3: product
+    file_loc: temp.csv

@@ -16,7 +16,7 @@ class S3Connector:
             response = self.client.list_buckets()
             self.logger.info('Existing buckets:')
             for bucket in response['Buckets']:
-                self.logger.info(f"""  {bucket["Name"]}""")
+                self.logger.info(f"""----------> {bucket["Name"]}""")
             return response.get("Buckets")
         except Exception as err:
             self.logger.error(f"Error Retrieving Buckets: {err}")
@@ -26,11 +26,20 @@ class S3Connector:
             bucket_ob = self.res_client.Bucket(bucket)
             self.logger.info('Existing Objects in Bucket {bucket} are:')
             for object in bucket_ob.objects.all():
-                self.logger.info(f"""  {bucket["Name"]}""")
+                self.logger.info(f"""----------> {object.key}""")
             return bucket_ob.objects.all()
         except Exception as err:
             self.logger.error(f"Error Retrieving Buckets: {err}")
 
+
+    def delete_object(self, bucket, file):
+        try:
+            self.res_client.Object(bucket, file).delete()
+            self.logger.info(f'Deleted Object {file} from Bucket {bucket}.')
+            return True
+        except Exception as err:
+            self.logger.error(f"Error Deleting Object: {err}")
+        return False
 
 
     def create_bucket(self, bucket, region="ap-south-1"):
@@ -46,6 +55,7 @@ class S3Connector:
     def upload_objects(self, bucket, src, dest):
         try:
             self.res_client.Bucket(bucket).upload_file(src, dest)
+            self.logger.info(f"Uploaded object {src} to {dest} in Bucket {bucket}.")
         except Exception as err:
             self.logger.error(f"Error inserting Objects: {err}")
             return False
