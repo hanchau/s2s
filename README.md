@@ -12,4 +12,4 @@
 #### CRONTAB
     crontab -e
         */25 * * * * cd /path/to/project && s2s-env/bin/python3 -m sql_to_sql.s2s
-        */25 * * * * cd /path/to/project && s2s-env/bin/python3 -m sql_to_sql.s2s3
+        */25 * * * * cd /path/to/project && s2s-env/bin/python3 -m sql_to_s3.s2s3
