@@ -1,6 +1,8 @@
-#### S2S / S2S3
+## S2S / S2S3 ![visitor badge](https://visitor-badge.glitch.me/badge?page_id=hanchau.s2s3&left_text=VisitorsSoFar)
 
-##### Project gives an implementation of SQL to SQl & S3 ingestion
+
+
+### Project gives an implementation of SQL to SQl & S3 ingestion
 
 #### To RUN
     python3 -m venv s2s-env
@@ -12,7 +14,7 @@
     source ./environment.sh
     python -m sql_to_sql.s2s3
 
-#### CRONTAB
+#### Crontab
     crontab -e
         */25 * * * * cd /path/to/project && s2s-env/bin/python3 -m sql_to_sql.s2s
-        */25 * * * * cd /path/to/project && s2s-env/bin/python3 -m sql_to_s3.s2s3
+        */50 * * * * cd /path/to/project && s2s-env/bin/python3 -m sql_to_s3.s2s3
