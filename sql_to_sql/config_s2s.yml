@@ -1,0 +1,50 @@
+
+task1:
+  source:
+    conn:
+      host: localhost
+      port: 3306
+      db: agrim
+      user: root
+      pwd: ROOT@123@mysql
+    get_query:    |
+                    with product_time_window as
+                    (
+                        select * from product 
+                        where last_modified between "%(start_time)s" and "%(end_time)s"
+                    )
+                    select "%(start_time)s" start_time, "%(end_time)s" end_time, P1.crop_sku, P1.selling_price min_selling_price
+                    from 
+                        product_time_window P1
+                    inner join
+                        (Select min(selling_price) selling_price from product_time_window 
+                        ) P2
+                    on P1.selling_price = P2.selling_price;
+    time_frame:
+      yday: True
+      start: "2022-07-01 10:00:00"
+      end: "2022-07-07 10:00:00"
+  dest:
+    conn:
+      host: localhost
+      port: 3306
+      db: agrim
+      user: root
+      pwd: ROOT@123@mysql
+    check_query:  |
+                    SELECT * FROM information_schema.tables
+                    WHERE table_name = 'min_selling_price'
+    insert_query: |
+                    INSERT INTO min_selling_price (start, end, crop_sku, min_selling_price) 
+                    VALUES ("%(start_time)s", "%(end_time)s", "%(crop_sku)s", %(min_selling_price)s);
+    create_query: | 
+                    create table min_selling_price (
+                    start datetime,
+                    end datetime,
+                    crop_sku varchar(255),
+                    min_selling_price double
+                    );
+
+
+task2:
+  skip: True

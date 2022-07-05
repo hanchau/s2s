@@ -1,0 +1,22 @@
+
+task1:
+  source:
+    conn:
+      host: localhost
+      port: 3306
+      db: agrim
+      user: root
+      pwd: ROOT@123@mysql
+    get_query:    |
+                    asf
+                    asdf
+  dest:
+    conn:
+      access_id: YOUR_ACCESS_KEY_ID
+      access_secret: YOUR_SECRET_ACCESS_KEY
+    bucket:
+      name:
+      id:
+
+task2:
+  skip: True
