@@ -1,3 +1,4 @@
+from distutils.command.clean import clean
 import yaml
 import time
 from utils.logger import Logger
@@ -21,7 +22,7 @@ class Transformer:
                 start = (datetime.now() - timedelta(days=1)).strftime(
                     "%Y-%m-%d %H:%M:%S"
                 )
-            formated_query = query % {"start_time":start, "end_time":end}
+            formated_query = query % {"start_time": start, "end_time": end}
             return formated_query
         except Exception as err:
             logger.error(f"Format Time: {err}")
@@ -82,20 +83,22 @@ if __name__ == "__main__":
         dest_insert_query = dest.get("insert_query")
         logger.info(f"Started Source Stage.")
         sql = SQLConnector(logger)
+        cleaner = Cleaner(logger)
 
- 
         try:
             start_time = time.time()
             conn = sql.connect(**src_conn)
             src_get_query = Transformer.format_time(src_get_query, src_time_frame)
             records = sql.fire_query(conn, src_get_query, rec_in_json=True)
             total_time = time.time() - start_time
-            logger.info(f"Records fetching complete. Total Records Fetched: [{len(records)}]. Total Time: [{total_time}]")
+            logger.info(
+                f"Records fetching complete. Total Records Fetched: [{len(records)}]. Total Time: [{total_time}]"
+            )
         except Exception as err:
             logger.error(f"Source Stage Error: {err}")
             raise Exception("Can't move forward")
 
-        Cleaner(logger).clean(conn, src_get_query, src, src_conn, src_get_query, src_time_frame)
+        cleaner.clean(conn, src_get_query, src, src_conn, src_get_query, src_time_frame)
 
         logger.info(f"Started Destination Stage")
         try:
@@ -104,10 +107,8 @@ if __name__ == "__main__":
             dest_exist = sql.fire_query(conn, dest_check_query)
             if not dest_exist:
                 sql.fire_query(conn, dest_create_query)
-            
-            status, no_of_rec = Uploader.dump_records(
-                conn, dest_insert_query, records
-            )
+
+            status, no_of_rec = Uploader.dump_records(conn, dest_insert_query, records)
             total_time = time.time() - start_time
             logger.info(
                 f"Ingestion Status: [{status}]. Total Records inserted: [{no_of_rec}]. Total Time: [{total_time}]"
@@ -115,14 +116,14 @@ if __name__ == "__main__":
         except Exception as err:
             logger.error(f"Source Stage Error: {err}")
 
-            Cleaner.clean(
-                conn,
-                dest_exist,
-                status,
-                no_of_rec,
-                dest,
-                dest_conn,
-                dest_check_query,
-                dest_create_query,
-                dest_insert_query,
-            )
+        cleaner.clean(
+            conn,
+            dest_exist,
+            status,
+            no_of_rec,
+            dest,
+            dest_conn,
+            dest_check_query,
+            dest_create_query,
+            dest_insert_query,
+        )
